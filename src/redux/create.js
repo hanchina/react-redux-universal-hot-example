@@ -4,8 +4,10 @@ import { routerMiddleware } from 'react-router-redux';
 
 export default function createStore(history, client, data) {
   // Sync dispatched route actions to the history
+  //异步分发路由actions到history
   const reduxRouterMiddleware = routerMiddleware(history);
 
+  //将reduxRouterMiddleware连入前面那个中间件
   const middleware = [createMiddleware(client), reduxRouterMiddleware];
 
   let finalCreateStore;

@@ -28,13 +28,16 @@ const proxy = httpProxy.createProxyServer({
   ws: true
 });
 
+//压缩中间件,支持gzip压缩和deflate压缩
 app.use(compression());
+//去除日志中的favicon条目,利用缓存提高性能
 app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
-
+//设置静态目录
 app.use(Express.static(path.join(__dirname, '..', 'static')));
 
 // Proxy to API server
 app.use('/api', (req, res) => {
+  //proxy的web方法可以代理请求
   proxy.web(req, res, {target: targetUrl});
 });
 
@@ -42,11 +45,12 @@ app.use('/ws', (req, res) => {
   proxy.web(req, res, {target: targetUrl + '/ws'});
 });
 
+//upgrade事件通常用来切换一个别的http协议或者其他协议
 server.on('upgrade', (req, socket, head) => {
   proxy.ws(req, socket, head);
 });
 
-// added the error handling to avoid https://github.com/nodejitsu/node-http-proxy/issues/527
+// 添加一个错误处理来避免这个错误:https://github.com/nodejitsu/node-http-proxy/issues/527
 proxy.on('error', (error, req, res) => {
   let json;
   if (error.code !== 'ECONNRESET') {
@@ -62,20 +66,23 @@ proxy.on('error', (error, req, res) => {
 
 app.use((req, res) => {
   if (__DEVELOPMENT__) {
-    // Do not cache webpack stats: the script file would change since
-    // hot module replacement is enabled in the development env
+    //不缓存webpack状态文件,因为当热替换在开发环境中被激活时,此文件可能会改变
     webpackIsomorphicTools.refresh();
   }
+  //实例化一个ApiClient,这是个操作API的工具类,可以格式化请求,就像jquery和ajax方法那样
   const client = new ApiClient(req);
+  //originalUrl是重定向的概念,指跳转页面以前的那个页面,如果没有重定向就是当前页面
   const memoryHistory = createHistory(req.originalUrl);
+  //使用自定义的创建store的方法创建store,包括了我们需要的中间件,热替换配置等等
   const store = createStore(memoryHistory, client);
+  //history是个增强版的memoryHistory,与store关联,并可以监听store的变化
   const history = syncHistoryWithStore(memoryHistory, store);
-
+  //只渲染客户端
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +
       ReactDOM.renderToString(<Html assets={webpackIsomorphicTools.assets()} store={store}/>));
   }
-
+  //如果服务端渲染被禁止,只渲染客户端
   if (__DISABLE_SSR__) {
     hydrateOnClient();
     return;
