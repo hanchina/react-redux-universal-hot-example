@@ -14,6 +14,7 @@ import {
   } from 'containers';
 
 export default (store) => {
+  // onEnter是个钩子函数,replace参数是个重定向函数
   const requireLogin = (nextState, replace, cb) => {
     function checkAuth() {
       const { auth: { user }} = store.getState();
@@ -23,7 +24,7 @@ export default (store) => {
       }
       cb();
     }
-
+    // 如果没有认证,就分发认证的action,得到一个promise,然后
     if (!isAuthLoaded(store.getState())) {
       store.dispatch(loadAuth()).then(checkAuth);
     } else {

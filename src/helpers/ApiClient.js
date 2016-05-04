@@ -17,7 +17,7 @@ export default class ApiClient {
   constructor(req) {
     methods.forEach((method) =>
       this[method] = (path, { params, data } = {}) => new Promise((resolve, reject) => {
-        //superagent是个小型的http请求库
+        // superagent是个小型的http请求库
         const request = superagent[method](formatUrl(path));
 
         if (params) {

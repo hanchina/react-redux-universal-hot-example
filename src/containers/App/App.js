@@ -13,6 +13,7 @@ import { push } from 'react-router-redux';
 import config from '../../config';
 import { asyncConnect } from 'redux-async-connect';
 
+// 使用这个装饰器,异步获取数据到props中,接受一个函数,参数为route的参数,store,param,helper等,这里只是载入Info和Auth
 @asyncConnect([{
   promise: ({store: {dispatch, getState}}) => {
     const promises = [];
@@ -27,6 +28,7 @@ import { asyncConnect } from 'redux-async-connect';
     return Promise.all(promises);
   }
 }])
+// 使用这个装饰器载入state和action到props中,push是react-router-redux的action creator,用于推送一个地址到历史记录中,并作为当前的地址
 @connect(
   state => ({user: state.auth.user}),
   {logout, pushState: push})

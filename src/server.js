@@ -96,6 +96,7 @@ app.use((req, res) => {
       res.status(500);
       hydrateOnClient();
     } else if (renderProps) {
+      // 载入组件的异步连接,那些promise,简言之,载入数据到store,防止出现闪屏
       loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
         const component = (
           <Provider store={store} key="provider">

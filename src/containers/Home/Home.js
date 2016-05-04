@@ -4,6 +4,7 @@ import { CounterButton, GithubButton } from 'components';
 import config from '../../config';
 import Helmet from 'react-helmet';
 
+// Home组件不需要载入任何数据到props上,但是使用了些组件
 export default class Home extends Component {
   render() {
     const styles = require('./Home.scss');
